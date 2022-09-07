@@ -1,10 +1,11 @@
 body {
   height: 100vh;
   margin: 0;
-  background-color: rgb(202, 202, 202);
+  background-color: rgb(255, 206, 132);
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 }
 
 .header {
@@ -40,7 +41,13 @@ body {
 /* * Option Section */
 .options {
   display: flex;
+  justify-content: space-evenly;
   padding: 15px 20px;
+  margin: 20px 0;
+}
+
+.options button {
+  margin: 5px 10px;
 }
 
 .resize {
