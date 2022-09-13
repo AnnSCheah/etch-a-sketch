@@ -1,5 +1,5 @@
 const div = document.querySelector(".container");
-const divStyle = getComputedStyle(div);
+const divStyle = getComputedStyle(div); // * getComputedStyle gets the element's attributes.
 
 // * Removes the 'px' and converts into an integer.
 const divWidth = parseInt(divStyle.width.slice(0, -2));
@@ -25,6 +25,13 @@ function createGrid(size) {
 
   // * Colors the cell black when mouse over.
   const blocks = document.querySelectorAll(".cell");
+
+  // * Uncomment the code block below for rainbow cell
+  // blocks.forEach((block) => {
+  //   block.addEventListener("mouseover", colorGen);
+  // });
+
+  // * Uncomment the block below for black cell
   blocks.forEach((block) => {
     block.addEventListener("mouseover", () => {
       block.classList.add("hovering");
@@ -32,8 +39,17 @@ function createGrid(size) {
   });
 }
 
+function colorGen() {
+  const r = Math.floor(Math.random() * 256);
+  const g = Math.floor(Math.random() * 256);
+  const b = Math.floor(Math.random() * 256);
+
+  this.style.backgroundColor = `rgb(${r},${g},${b})`;
+}
+
 function resizeGrid() {
   let newSize = prompt("Size? (Min: 4, Max: 50)");
+  if (newSize == null) return;
   if (Number.isInteger(parseInt(newSize))) {
     if (newSize > 50 || newSize < 4) {
       alert("Invalid size");
@@ -56,5 +72,6 @@ function clearGrid() {
   const element = document.querySelectorAll(".cell");
   element.forEach((cell) => {
     cell.classList.remove("hovering");
+    cell.style.removeProperty("background-color");
   });
 }
