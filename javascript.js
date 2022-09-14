@@ -1,18 +1,28 @@
 const div = document.querySelector(".container");
 const divStyle = getComputedStyle(div); // * getComputedStyle gets the element's attributes.
+let blocks;
 
 // * Removes the 'px' and converts into an integer.
 const divWidth = parseInt(divStyle.width.slice(0, -2));
 const divHeight = parseInt(divStyle.height.slice(0, -2));
 
 let gridSize = 16; // * Default grid size
-createGrid(gridSize);
 
 const resize = document.querySelector(".resize");
 resize.addEventListener("click", resizeGrid);
 
 const reset = document.querySelector(".reset");
 reset.addEventListener("click", clearGrid);
+
+document.querySelector(".black-mode").disabled = true; // * Sets black mode as default
+
+const blackMode = document.querySelector(".black-mode");
+blackMode.addEventListener("click", modeSelect);
+
+const colorMode = document.querySelector(".color-mode");
+colorMode.addEventListener("click", modeSelect);
+
+createGrid(gridSize);
 
 function createGrid(size) {
   for (let i = 0; i < size * size; i++) {
@@ -23,23 +33,24 @@ function createGrid(size) {
     div.appendChild(cell);
   }
 
-  // * Colors the cell black when mouse over.
-  const blocks = document.querySelectorAll(".cell");
+  blocks = document.querySelectorAll(".cell"); // * Selects all the cell div
 
-  // * Uncomment the code block below for rainbow cell
-  // blocks.forEach((block) => {
-  //   block.addEventListener("mouseover", colorGen);
-  // });
-
-  // * Uncomment the block below for black cell
-  blocks.forEach((block) => {
-    block.addEventListener("mouseover", () => {
-      block.classList.add("hovering");
+  if (blackMode.disabled == false) {
+    // * Color Mode
+    blocks.forEach((block) => {
+      block.addEventListener("mouseover", randomColorGen);
     });
-  });
+  } else {
+    // * Black Mode
+    blocks.forEach((block) => {
+      block.addEventListener("mouseover", () => {
+        block.classList.add("hovering");
+      });
+    });
+  }
 }
 
-function colorGen() {
+function randomColorGen() {
   const r = Math.floor(Math.random() * 256);
   const g = Math.floor(Math.random() * 256);
   const b = Math.floor(Math.random() * 256);
@@ -56,11 +67,7 @@ function resizeGrid() {
       return;
     }
 
-    // * Deletes all the cell grid before calling createGrid
-    const element = document.querySelectorAll(".cell");
-    element.forEach((cell) => {
-      cell.remove();
-    });
+    deleteGrid();
 
     createGrid(newSize);
   } else {
@@ -74,4 +81,25 @@ function clearGrid() {
     cell.classList.remove("hovering");
     cell.style.removeProperty("background-color");
   });
+}
+
+function deleteGrid() {
+  const element = document.querySelectorAll(".cell");
+  element.forEach((cell) => {
+    cell.remove();
+  });
+}
+
+function modeSelect() {
+  if (this.className == "color-mode") {
+    colorMode.disabled = true;
+    blackMode.disabled = false;
+    deleteGrid();
+    createGrid(gridSize);
+  } else {
+    blackMode.disabled = true;
+    colorMode.disabled = false;
+    deleteGrid();
+    createGrid(gridSize);
+  }
 }
