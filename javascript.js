@@ -8,19 +8,22 @@ const divHeight = parseInt(divStyle.height.slice(0, -2));
 
 let gridSize = 16; // * Default grid size
 
+document.querySelector(".black-mode").disabled = true; // * Sets black mode as default
+
 const resize = document.querySelector(".resize");
 resize.addEventListener("click", resizeGrid);
 
 const reset = document.querySelector(".reset");
 reset.addEventListener("click", clearGrid);
 
-document.querySelector(".black-mode").disabled = true; // * Sets black mode as default
-
 const blackMode = document.querySelector(".black-mode");
 blackMode.addEventListener("click", modeSelect);
 
 const colorMode = document.querySelector(".color-mode");
 colorMode.addEventListener("click", modeSelect);
+
+const shadeMode = document.querySelector(".shade-mode");
+shadeMode.addEventListener("click", modeSelect);
 
 createGrid(gridSize);
 
@@ -35,17 +38,22 @@ function createGrid(size) {
 
   blocks = document.querySelectorAll(".cell"); // * Selects all the cell div
 
-  if (blackMode.disabled == false) {
+  if (colorMode.disabled == true) {
     // * Color Mode
     blocks.forEach((block) => {
       block.addEventListener("mouseover", randomColorGen);
     });
-  } else {
+  } else if (blackMode.disabled == true) {
     // * Black Mode
     blocks.forEach((block) => {
       block.addEventListener("mouseover", () => {
         block.classList.add("hovering");
       });
+    });
+  } else if (shadeMode.disabled == true) {
+    // * Shade Mode
+    blocks.forEach((block) => {
+      block.addEventListener("mouseover", shadeBlack);
     });
   }
 }
@@ -58,6 +66,21 @@ function randomColorGen() {
   this.style.backgroundColor = `rgb(${r},${g},${b})`;
 }
 
+function shadeBlack() {
+  // * Checks if the backgroundColor "rgba" attribute exist, if (cont)
+  // * not a default backgroundColor of opacity 0.1 is set
+  if (this.style.backgroundColor.match(/rgba/)) {
+    let currentOpacity = Number(this.style.backgroundColor.slice(-4, -1));
+    if (currentOpacity <= 0.9) {
+      this.style.backgroundColor = `rgba(0,0,0,${currentOpacity + 0.1})`;
+    }
+  } else if (this.style.backgroundColor == "rgb(0, 0, 0)") {
+    return; // * Stops the function once opacity is 1
+  } else {
+    this.style.backgroundColor = "rgba(0,0,0,0.1)";
+  }
+}
+
 function resizeGrid() {
   let newSize = prompt("Size? (Min: 4, Max: 50)");
   if (newSize == null) return;
@@ -67,9 +90,10 @@ function resizeGrid() {
       return;
     }
 
-    deleteGrid();
+    gridSize = newSize;
 
-    createGrid(newSize);
+    deleteGrid();
+    createGrid(gridSize);
   } else {
     alert("Input is not a number");
   }
@@ -78,9 +102,16 @@ function resizeGrid() {
 function clearGrid() {
   const element = document.querySelectorAll(".cell");
   element.forEach((cell) => {
+    cell.style.transition = "0.3s";
     cell.classList.remove("hovering");
     cell.style.removeProperty("background-color");
   });
+
+  // * Runs the function after 1000ms (1 second)
+  setTimeout(function () {
+    deleteGrid();
+    createGrid(gridSize);
+  }, 300);
 }
 
 function deleteGrid() {
@@ -94,11 +125,19 @@ function modeSelect() {
   if (this.className == "color-mode") {
     colorMode.disabled = true;
     blackMode.disabled = false;
+    shadeMode.disabled = false;
     deleteGrid();
     createGrid(gridSize);
-  } else {
+  } else if (this.className == "black-mode") {
     blackMode.disabled = true;
     colorMode.disabled = false;
+    shadeMode.disabled = false;
+    deleteGrid();
+    createGrid(gridSize);
+  } else if (this.className == "shade-mode") {
+    shadeMode.disabled = true;
+    colorMode.disabled = false;
+    blackMode.disabled = false;
     deleteGrid();
     createGrid(gridSize);
   }
